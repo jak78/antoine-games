@@ -8,7 +8,7 @@ async function setup() {
   const canvas = createCanvas(900, 600);
   canvas.parent('game-container')
   vaisseau = await loadImage('vaisseau.png');
-  obstacle = await loadImage('obstacle_3_reacteur_energetique.png');
+  obstacle = await loadImage('magma.png');
   pause_img = await loadImage('pause.png')
   fond_etoiles= await loadImage('01_etoiles.png')
   fond_planetes= await loadImage('04_planetes_premier_plan.png')
