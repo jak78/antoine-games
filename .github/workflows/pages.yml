@@ -25,7 +25,7 @@ jobs:
       - name: Upload game files
         uses: actions/upload-pages-artifact@v3
         with:
-          path: astro_dash
+          path: .
 
   deploy:
     environment:
