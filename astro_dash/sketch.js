@@ -1,4 +1,6 @@
 let gameStarted = false
+let distanceTraveled = 0
+let saved_speed = 0
 let musicTracks = []
 let currentMusicIndex = -1
 let musicPlaybackId = 0
@@ -51,10 +53,13 @@ function switchMusic() {
 }
 
 function resetGame() {
+  distanceTraveled = 0
+
   speed_origine = 2.3;
   acceleration_origine = 0.001;
   speed = speed_origine;
   acceleration = acceleration_origine;
+  saved_speed = speed
   
   pause = false
   gameover = false
@@ -81,6 +86,7 @@ function resetGame() {
 
 function makeGameOver() {
   if(gameover) return
+  if(!pause) saved_speed = speed
   speed = 0
   acceleration = 0
   gameover = true
@@ -93,6 +99,18 @@ function displayGameOver() {
 }
 function displayPause() {
   image(pause_img, 200, 220, 500, 150);
+}
+
+function displayHud() {
+  const displayedSpeed = pause || gameover ? saved_speed : speed
+  push()
+  textAlign(RIGHT, TOP)
+  textSize(24)
+  fill(255)
+  stroke(0)
+  strokeWeight(4)
+  text(`speed: ${(displayedSpeed / 2.3).toFixed(1)}  distance: ${Math.floor(distanceTraveled / 100)}`, width - 20, 20)
+  pop()
 }
 
 
@@ -128,6 +146,7 @@ function draw() {
   if(gameover) {
     displayGameOver()
   }
+  displayHud()
   
   // Coordonnées des obstacles :
   obstacleX = obstacleX - speed
@@ -179,8 +198,9 @@ function draw() {
   fond_planetesX=fond_planetesX-speed/2
   if (fond_planetesX< -900) {fond_planetesX = 0}
     
-  // Accélération :
-  speed=acceleration + speed
+  // Accélération et distance parcourue:
+  speed = acceleration + speed
+  distanceTraveled += speed
 
   // Détection de collision :
   nose_x = spaceship_x + spaceship_w
