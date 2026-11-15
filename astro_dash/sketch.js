@@ -1,6 +1,13 @@
 let gameStarted = false
 let distanceTraveled = 0
 let saved_speed = 0
+let hudGraphics
+let lastHudText = null
+const hudPalette = [
+  [6, 20, 40, 220],
+  [65, 220, 255, 255],
+  [190, 245, 255, 255]
+]
 let musicTracks = []
 let currentMusicIndex = -1
 let musicPlaybackId = 0
@@ -9,6 +16,8 @@ let musicPlaybackId = 0
 async function setup() {
   const canvas = createCanvas(900, 600);
   canvas.parent('game-container')
+  hudGraphics = createGraphics(210, 27)
+  hudGraphics.pixelDensity(1)
   vaisseau = await loadImage('vaisseau.png');
   obstacle = await loadImage('magma.png');
   pause_img = await loadImage('pause.png')
@@ -103,13 +112,50 @@ function displayPause() {
 
 function displayHud() {
   const displayedSpeed = pause || gameover ? saved_speed : speed
+  const hudText = `speed: ${(displayedSpeed / 2.3).toFixed(1)}  distance: ${Math.floor(distanceTraveled / 100)}`
+  if(hudText !== lastHudText) {
+    hudGraphics.clear()
+    hudGraphics.noStroke()
+    hudGraphics.fill(6, 20, 40, 220)
+    hudGraphics.rect(0, 0, hudGraphics.width, hudGraphics.height)
+    hudGraphics.stroke(65, 220, 255)
+    hudGraphics.strokeWeight(1)
+    hudGraphics.noFill()
+    hudGraphics.rect(0.5, 0.5, hudGraphics.width - 1, hudGraphics.height - 1)
+    hudGraphics.noStroke()
+    hudGraphics.fill(190, 245, 255)
+    hudGraphics.textFont('monospace')
+    hudGraphics.textStyle(BOLD)
+    hudGraphics.textSize(12)
+    hudGraphics.textAlign(RIGHT, TOP)
+    hudGraphics.text(hudText, hudGraphics.width - 6, 6)
+    hudGraphics.loadPixels()
+    for(let i = 0; i < hudGraphics.pixels.length; i += 4) {
+      if(hudGraphics.pixels[i + 3] === 0) continue
+      let nearestColor = hudPalette[0]
+      let nearestDistance = Infinity
+      for(const color of hudPalette) {
+        const redDiff = hudGraphics.pixels[i] - color[0]
+        const greenDiff = hudGraphics.pixels[i + 1] - color[1]
+        const blueDiff = hudGraphics.pixels[i + 2] - color[2]
+        const colorDistance = redDiff * redDiff + greenDiff * greenDiff + blueDiff * blueDiff
+        if(colorDistance < nearestDistance) {
+          nearestColor = color
+          nearestDistance = colorDistance
+        }
+      }
+      hudGraphics.pixels[i] = nearestColor[0]
+      hudGraphics.pixels[i + 1] = nearestColor[1]
+      hudGraphics.pixels[i + 2] = nearestColor[2]
+      hudGraphics.pixels[i + 3] = nearestColor[3]
+    }
+    hudGraphics.updatePixels()
+    lastHudText = hudText
+  }
+
   push()
-  textAlign(RIGHT, TOP)
-  textSize(24)
-  fill(255)
-  stroke(0)
-  strokeWeight(4)
-  text(`speed: ${(displayedSpeed / 2.3).toFixed(1)}  distance: ${Math.floor(distanceTraveled / 100)}`, width - 20, 20)
+  drawingContext.imageSmoothingEnabled = false
+  image(hudGraphics, width - hudGraphics.width * 2 - 20, 10, hudGraphics.width * 2, hudGraphics.height * 2)
   pop()
 }
 
