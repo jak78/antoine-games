@@ -1,12 +1,8 @@
-
-// tuyau escape  - Version 1
-// Notre premier vaisseau spatial !
-
 // Cette fonction est exécutée une seule fois
 async function setup() {
   createCanvas(900, 600);
   vaisseau = await loadImage('vaisseau.png');
-  tuyau = await loadImage('obstacle_3_reacteur_energetique.png');
+  obstacle = await loadImage('obstacle_3_reacteur_energetique.png');
   pause_img = await loadImage('pause.png')
   fond_etoiles= await loadImage('01_etoiles.png')
   fond_planetes= await loadImage('04_planetes_premier_plan.png')
@@ -33,12 +29,12 @@ function resetGame() {
   fond_etoilesX2=600
   fond_planetesX=0
 
-  tuyauX=370
-  tuyauX2=800
-  tuyauY=300
-  tuyauY2=0
-  tuyau_w = 100
-  tuyau_h = 300  
+  obstacleX=370
+  obstacleX2=800
+  obstacleY=300
+  obstacleY2=0
+  obstacle_w = 100
+  obstacle_h = 300
 }
 
 function makeGameOver() {
@@ -75,8 +71,8 @@ function draw() {
   
   // Dessin des sprites
   image(vaisseau, spaceship_x, spaceship_y, spaceship_w, spaceship_h);
-  image(tuyau,tuyauX,tuyauY,tuyau_w,tuyau_h)
-  image(tuyau,tuyauX2,tuyauY2,tuyau_w,tuyau_h)
+  image(obstacle,obstacleX,obstacleY,obstacle_w,obstacle_h)
+  image(obstacle,obstacleX2,obstacleY2,obstacle_w,obstacle_h)
   if(pause) {
     displayPause()
   }
@@ -85,46 +81,46 @@ function draw() {
   }
   
   // Coordonnées des obstacles :
-  tuyauX = tuyauX - speed
-  tuyauX2 = tuyauX2 - speed 
-  if(tuyauX < -100) {
-    tuyauX = 900
-    if(tuyauY2 == 0) {
+  obstacleX = obstacleX - speed
+  obstacleX2 = obstacleX2 - speed
+  if(obstacleX < -100) {
+    obstacleX = 900
+    if(obstacleY2 == 0) {
       pos_autorisee_1 = 150
       pos_autorisee_2 = 300
     }
-    if(tuyauY2 == 150) {
+    if(obstacleY2 == 150) {
       pos_autorisee_1 = 0
       pos_autorisee_2 = 300
     }
-    if(tuyauY2 == 300) {
+    if(obstacleY2 == 300) {
       pos_autorisee_1 = 0
       pos_autorisee_2 = 150
     }
     if(Math.random() < 0.5) {
-      tuyauY = pos_autorisee_1
+      obstacleY = pos_autorisee_1
     } else {
-      tuyauY = pos_autorisee_2
+      obstacleY = pos_autorisee_2
     }    
   }
-  if(tuyauX2 < -100) {
-    tuyauX2 = 900
-    if(tuyauY == 0) {
+  if(obstacleX2 < -100) {
+    obstacleX2 = 900
+    if(obstacleY == 0) {
       pos_autorisee_1 = 150
       pos_autorisee_2 = 300
     }
-    if(tuyauY == 150) {
+    if(obstacleY == 150) {
       pos_autorisee_1 = 0
       pos_autorisee_2 = 300
     }
-    if(tuyauY == 300) {
+    if(obstacleY == 300) {
       pos_autorisee_1 = 0
       pos_autorisee_2 = 150
     }
     if(Math.random() < 0.5) {
-      tuyauY2 = pos_autorisee_1
+      obstacleY2 = pos_autorisee_1
     } else {
-      tuyauY2 = pos_autorisee_2
+      obstacleY2 = pos_autorisee_2
     }
   }
 
@@ -140,17 +136,17 @@ function draw() {
   // Détection de collision :
   nose_x = spaceship_x + spaceship_w
   nose_y = spaceship_y + ( spaceship_h / 2 )
-  if( (nose_x >= tuyauX ) && ( nose_x <= tuyauX + tuyau_w ) 
+  if( (nose_x >= obstacleX ) && ( nose_x <= obstacleX + obstacle_w )
       && 
-      (nose_y >= tuyauY ) && (nose_y <= tuyauY + tuyau_h)
+      (nose_y >= obstacleY ) && (nose_y <= obstacleY + obstacle_h)
   ) {
     makeGameOver()
   }
   nose_x = spaceship_x + spaceship_w
   nose_y = spaceship_y + ( spaceship_h / 2 )
-  if( (nose_x >= tuyauX2 ) && ( nose_x <= tuyauX2 + tuyau_w ) 
+  if( (nose_x >= obstacleX2 ) && ( nose_x <= obstacleX2 + obstacle_w )
       && 
-      (nose_y >= tuyauY2 ) && (nose_y <= tuyauY2 + tuyau_h)
+      (nose_y >= obstacleY2 ) && (nose_y <= obstacleY2 + obstacle_h)
   ) {
     makeGameOver()
   }
