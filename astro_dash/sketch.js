@@ -1,13 +1,53 @@
+let gameStarted = false
+let musicTracks = []
+let currentMusicIndex = -1
+let musicPlaybackId = 0
+
 // Cette fonction est exécutée une seule fois
 async function setup() {
-  createCanvas(900, 600);
+  const canvas = createCanvas(900, 600);
+  canvas.parent('game-container')
   vaisseau = await loadImage('vaisseau.png');
   obstacle = await loadImage('obstacle_3_reacteur_energetique.png');
   pause_img = await loadImage('pause.png')
   fond_etoiles= await loadImage('01_etoiles.png')
   fond_planetes= await loadImage('04_planetes_premier_plan.png')
   game_over_img = await loadImage('game_over.png')
-  resetGame()
+  musicTracks = await Promise.all([
+    loadSound('music/01_slay_the_evil.mp3'),
+    loadSound('music/15_rush_point.mp3')
+  ])
+  const startButton = document.getElementById('start-button')
+  startButton.addEventListener('click', () => {
+    if(gameStarted) return
+    startButton.blur()
+    startButton.hidden = true
+    gameStarted = true
+    resetGame()
+  })
+  startButton.disabled = false
+}
+
+function switchMusic() {
+  const playbackId = ++musicPlaybackId
+  if(currentMusicIndex === -1) {
+    currentMusicIndex = Math.floor(Math.random() * musicTracks.length)
+  } else {
+    const previousTrack = musicTracks[currentMusicIndex]
+    previousTrack.onended(() => {})
+    previousTrack.stop()
+    currentMusicIndex = (currentMusicIndex + 1) % musicTracks.length
+  }
+  const track = musicTracks[currentMusicIndex]
+  const endsAt = getAudioContext().currentTime + track.duration()
+  track.onended(() => {
+    if(playbackId !== musicPlaybackId) return
+    // stop() peut aussi declencher onended, meme apres un nouveau play().
+    if(getAudioContext().currentTime < endsAt) return
+    switchMusic()
+  })
+  if(!pause && !gameover) userStartAudio()
+  track.play()
 }
 
 function resetGame() {
@@ -35,6 +75,8 @@ function resetGame() {
   obstacleY2=0
   obstacle_w = 100
   obstacle_h = 300
+
+  switchMusic()
 }
 
 function makeGameOver() {
@@ -43,6 +85,7 @@ function makeGameOver() {
   acceleration = 0
   gameover = true
   gameoverTime = millis()
+  userStopAudio()
 }
 
 function displayGameOver() {
@@ -55,6 +98,12 @@ function displayPause() {
 
 // Cette fonction est exécutée en boucle
 function draw() {
+  if(!gameStarted) {
+    background(0,0,0)
+    image(fond_etoiles,0,0,900,600)
+    image(fond_planetes,0,0,900,600)
+    return
+  }
 
   // Commandes du vaisseau
   if (!pause && !gameover) {
@@ -157,13 +206,14 @@ function draw() {
 }
 
 function switchPause() {
-  if(gameover) return
+  if(!gameStarted || gameover) return
   if(pause) {
     // On est en pause donc on enlève la pause
     // On doit donc remettre la vitesse et l'accélération d'avant la pause
     acceleration = saved_acceleration
     speed = saved_speed
     pause = false
+    userStartAudio()
   } else  {
     // Si on arrive ici, c'est qu'on est pas en pause, donc on met pause
     // On sauvegarde d'abord la vitesse et l'acceleration
@@ -173,10 +223,12 @@ function switchPause() {
     speed = 0
     acceleration = 0
     pause = true
+    userStopAudio()
   }
 }
 function keyPressed() {
-  if (key === ' ') {
+  if (key === ' ' && gameStarted) {
     switchPause()
+    return false
   }
 }
