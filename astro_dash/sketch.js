@@ -145,7 +145,7 @@ function draw() {
   obstacles_x[1] = obstacles_x[1] - speed
   if(obstacles_x[0] < -100) {
     obstacles_x[0] = 900
-    if(Math.random() < (1.0) && speed < 4*2.3) {
+    if(Math.random() < (1.0/3.5) && speed < 4*2.3) {
       obstacle_moving = true
       obstacles_h[0] = 100
       obstacles_w[0] = 50
