@@ -15,6 +15,7 @@ async function setup() {
   obstacle_moving_img = await loadImage('obstacle_3_reacteur_energetique.png')
   pause_img = await loadImage('pause.png')
   fond_etoiles= await loadImage('01_etoiles.png')
+  fond_nebuleuse= await loadImage('02_nebuleuses_2.png')
   fond_planetes= await loadImage('04_planetes_premier_plan.png')
   game_over_img = await loadImage('game_over.png')
   musicTracks = await Promise.all([
@@ -73,7 +74,7 @@ function resetGame() {
   spaceship_h = 100
  
   fond_etoilesX=0
-  fond_etoilesX2=600
+  fond_nebuleuseX=0
   fond_planetesX=0
 
   obstacles_x = [370, 800]
@@ -122,6 +123,8 @@ function draw() {
   background(0,0,0)
   image(fond_etoiles,fond_etoilesX,0,900,600)
   image(fond_etoiles,fond_etoilesX+900,0,900,600)
+  image(fond_nebuleuse,fond_nebuleuseX,0,900,600)
+  image(fond_nebuleuse,fond_nebuleuseX+900,0,900,600)
   image(fond_planetes,fond_planetesX,0,900,600)
   image(fond_planetes,fond_planetesX+900,0,900,600)
   
@@ -197,6 +200,8 @@ function draw() {
   // Parallaxes :
   fond_etoilesX=fond_etoilesX-speed/5
   if (fond_etoilesX< -900) {fond_etoilesX = 0}
+  fond_nebuleuseX=fond_nebuleuseX-speed/3
+  if (fond_nebuleuseX< -900) {fond_nebuleuseX = 0}
   fond_planetesX=fond_planetesX-speed/2
   if (fond_planetesX< -900) {fond_planetesX = 0}
     
