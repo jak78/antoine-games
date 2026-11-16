@@ -12,6 +12,7 @@ async function setup() {
   Hud.setup()
   vaisseau = await loadImage('vaisseau.png');
   obstacle = await loadImage('magma.png');
+  obstacle_moving_img = await loadImage('obstacle_3_reacteur_energetique.png')
   pause_img = await loadImage('pause.png')
   fond_etoiles= await loadImage('01_etoiles.png')
   fond_planetes= await loadImage('04_planetes_premier_plan.png')
@@ -75,12 +76,12 @@ function resetGame() {
   fond_etoilesX2=600
   fond_planetesX=0
 
-  obstacleX=370
-  obstacleX2=800
-  obstacleY=300
-  obstacleY2=0
-  obstacle_w = 100
-  obstacle_h = 300
+  obstacles_x = [370, 800]
+  obstacles_y = [300, 0]
+  obstacles_w = [100, 100]
+  obstacles_h = [300, 300]
+
+  obstacle_moving = false
 
   switchMusic()
 }
@@ -126,8 +127,8 @@ function draw() {
   
   // Dessin des sprites
   image(vaisseau, spaceship_x, spaceship_y, spaceship_w, spaceship_h);
-  image(obstacle,obstacleX,obstacleY,obstacle_w,obstacle_h)
-  image(obstacle,obstacleX2,obstacleY2,obstacle_w,obstacle_h)
+  image(obstacle_moving ? obstacle_moving_img : obstacle,obstacles_x[0],obstacles_y[0],obstacles_w[0],obstacles_h[0])
+  image(obstacle, obstacles_x[1],obstacles_y[1],obstacles_w[1],obstacles_h[1])
   if(pause) {
     displayPause()
   }
@@ -137,47 +138,60 @@ function draw() {
   Hud.draw(speed, saved_speed, pause, gameover, distanceTraveled)
   
   // Coordonnées des obstacles :
-  obstacleX = obstacleX - speed
-  obstacleX2 = obstacleX2 - speed
-  if(obstacleX < -100) {
-    obstacleX = 900
-    if(obstacleY2 == 0) {
+  obstacles_x[0] = obstacles_x[0] - speed
+  obstacles_x[1] = obstacles_x[1] - speed
+  if(obstacles_x[0] < -100) {
+    obstacles_x[0] = 900
+    if(Math.random() < (1.0) && speed < 4*2.3) {
+      obstacle_moving = true
+      obstacles_h[0] = 100
+      obstacles_w[0] = 50
+    } else {
+      obstacle_moving = false
+      obstacles_h[0] = 300
+      obstacles_w[0] = 100
+    }
+    if(obstacles_y[1] == 0) {
       pos_autorisee_1 = 150
       pos_autorisee_2 = 300
     }
-    if(obstacleY2 == 150) {
+    if(obstacles_y[1] == 150) {
       pos_autorisee_1 = 0
       pos_autorisee_2 = 300
     }
-    if(obstacleY2 == 300) {
+    if(obstacles_y[1] == 300) {
       pos_autorisee_1 = 0
       pos_autorisee_2 = 150
     }
     if(Math.random() < 0.5) {
-      obstacleY = pos_autorisee_1
+      obstacles_y[0] = pos_autorisee_1
     } else {
-      obstacleY = pos_autorisee_2
+      obstacles_y[0] = pos_autorisee_2
     }    
   }
-  if(obstacleX2 < -100) {
-    obstacleX2 = 900
-    if(obstacleY == 0) {
+  if(obstacles_x[1] < -100) {
+    obstacles_x[1] = 900
+    if(obstacles_y[0] == 0) {
       pos_autorisee_1 = 150
       pos_autorisee_2 = 300
     }
-    if(obstacleY == 150) {
+    if(obstacles_y[0] == 150) {
       pos_autorisee_1 = 0
       pos_autorisee_2 = 300
     }
-    if(obstacleY == 300) {
+    if(obstacles_y[0] == 300) {
       pos_autorisee_1 = 0
       pos_autorisee_2 = 150
     }
     if(Math.random() < 0.5) {
-      obstacleY2 = pos_autorisee_1
+      obstacles_y[1] = pos_autorisee_1
     } else {
-      obstacleY2 = pos_autorisee_2
+      obstacles_y[1] = pos_autorisee_2
     }
+  }
+  if(obstacle_moving && ! pause) {
+    // Fais varier la coordonnée Y de l'obstacle de façon sinusoidale
+    obstacles_y[0] = 250 + 250 * Math.sin(distanceTraveled / 200)
   }
 
   // Parallaxes :
@@ -193,19 +207,11 @@ function draw() {
   // Détection de collision :
   nose_x = spaceship_x + spaceship_w
   nose_y = spaceship_y + ( spaceship_h / 2 )
-  if( (nose_x >= obstacleX ) && ( nose_x <= obstacleX + obstacle_w )
-      && 
-      (nose_y >= obstacleY ) && (nose_y <= obstacleY + obstacle_h)
-  ) {
-    makeGameOver()
-  }
-  nose_x = spaceship_x + spaceship_w
-  nose_y = spaceship_y + ( spaceship_h / 2 )
-  if( (nose_x >= obstacleX2 ) && ( nose_x <= obstacleX2 + obstacle_w )
-      && 
-      (nose_y >= obstacleY2 ) && (nose_y <= obstacleY2 + obstacle_h)
-  ) {
-    makeGameOver()
+  for (let i = 0; i < obstacles_x.length; i++) {
+    if ((nose_x >= obstacles_x[i]) && (nose_x <= obstacles_x[i] + obstacles_w[i])
+        && (nose_y >= obstacles_y[i]) && (nose_y <= obstacles_y[i] + obstacles_h[i])) {
+      makeGameOver()
+    }
   }
 
   if(gameover && (millis() - gameoverTime >= 3000)) {
