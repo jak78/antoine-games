@@ -194,7 +194,7 @@ function draw() {
   }
   if(obstacle_moving && ! pause) {
     // Fais varier la coordonnée Y de l'obstacle de façon sinusoidale
-    obstacles_y[0] = 250 + 250 * Math.sin(distanceTraveled / 200)
+    obstacles_y[0] = 250 + 250 * Math.sin(distanceTraveled / speed / 50)
   }
 
   // Parallaxes :
