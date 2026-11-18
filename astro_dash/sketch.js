@@ -70,7 +70,7 @@ function resetGame() {
 
   spaceship_x = 10
   spaceship_y = 150
-  spaceship_w = 190
+  spaceship_w = 150
   spaceship_h = 100
  
   fond_etoilesX=0
