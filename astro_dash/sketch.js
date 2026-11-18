@@ -68,7 +68,7 @@ function resetGame() {
   gameover = false
   gameoverTime = 0
 
-  spaceship_x = 10
+  spaceship_x = 40
   spaceship_y = 150
   spaceship_w = 150
   spaceship_h = 100
