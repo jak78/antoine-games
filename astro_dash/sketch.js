@@ -192,7 +192,7 @@ function draw() {
       obstacles_y[1] = pos_autorisee_2
     }
   }
-  if(obstacle_moving && ! pause) {
+  if(obstacle_moving && ! pause && !gameover) {
     // Fais varier la coordonnée Y de l'obstacle de façon sinusoidale
     obstacles_y[0] = 250 + 250 * Math.sin(distanceTraveled / speed / 50)
   }
