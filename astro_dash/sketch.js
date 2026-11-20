@@ -155,6 +155,7 @@ function draw() {
   if(!gameStarted) {
     background(0,0,0)
     image(fond_etoiles,0,0,900,600)
+    image(fond_nebuleuse,0,0,900,600)
     drawPlanets(0)
     return
   }
