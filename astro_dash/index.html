@@ -12,7 +12,15 @@
   </head>
   <body>
     <main id="game-container">
-      <button id="start-button" type="button" disabled>start</button>
+      <button id="start-button" type="button" aria-label="start" disabled>
+        <svg viewBox="0 0 29 7" aria-hidden="true">
+          <path d="M1 0H5V1H1V3H4V4H5V6H4V7H0V6H4V4H1V3H0V1H1Z"/>
+          <path d="M6 0H11V1H9V7H8V1H6Z"/>
+          <path fill-rule="evenodd" d="M13 0H16V1H17V7H16V4H13V7H12V1H13ZM13 1V3H16V1Z"/>
+          <path fill-rule="evenodd" d="M18 0H22V1H23V3H22V4H21L23 7H22L20 4H19V7H18ZM19 1V3H22V1Z"/>
+          <path d="M24 0H29V1H27V7H26V1H24Z"/>
+        </svg>
+      </button>
     </main>
     <script src="hud.js"></script>
     <script src="sketch.js"></script>
