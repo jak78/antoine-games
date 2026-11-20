@@ -20,6 +20,7 @@ canvas {
   padding: 16px 27px;
   color: white;
   background: #d83a38;
+  animation: start-button-blink 1s steps(1, end) infinite;
   border: 0;
   border-radius: 0;
   box-shadow: 0 -4px 0 #4e101b, 0 4px 0 #4e101b,
@@ -27,6 +28,16 @@ canvas {
     0 8px 0 #290a12, inset 0 4px 0 #ff9990,
     inset 0 -5px 0 #8e1c2a;
   cursor: pointer;
+}
+@keyframes start-button-blink {
+  0%, 100% {
+    color: white;
+    background: #d83a38;
+  }
+  50% {
+    color: #d83a38;
+    background: white;
+  }
 }
 #start-button svg {
   display: block;
