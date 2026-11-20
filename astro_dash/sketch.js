@@ -17,7 +17,9 @@ async function setup() {
   pause_img = await loadImage('pause.png')
   fond_etoiles= await loadImage('01_etoiles.png')
   fond_nebuleuse= await loadImage('02_nebuleuses_2.png')
-  fond_planetes= await loadImage('04_planetes_premier_plan.png')
+  planete_terre = await loadImage('planete_terre.png')
+  planete_rouge = await loadImage('planete_rouge.png')
+  planete_crateres = await loadImage('planete_crateres.png')
   game_over_img = await loadImage('game_over.png')
   musicTracks = await Promise.all([
     loadSound('music/01_slay_the_evil.mp3'),
@@ -77,7 +79,7 @@ function resetGame() {
  
   fond_etoilesX=0
   fond_nebuleuseX=0
-  fond_planetesX=0
+  planetesX=0
 
   obstacles_x = [370, 800]
   obstacles_y = [300, 0]
@@ -104,6 +106,17 @@ function displayGameOver() {
 }
 function displayPause() {
   image(pause_img, 200, 220, 500, 150);
+}
+
+function drawPlanets(scrollX) {
+  const scaleX = 900 / 750
+  const scaleY = 600 / 498
+  for (const offset of [-900, 0, 900]) {
+    const x = scrollX + offset
+    image(planete_terre, x + 127 * scaleX, 181 * scaleY, 125 * scaleX, 124 * scaleY)
+    image(planete_rouge, x + 474 * scaleX, 41 * scaleY, 172 * scaleX, 169 * scaleY)
+    image(planete_crateres, x + 568 * scaleX, 312 * scaleY, 316 * scaleX, 185 * scaleY)
+  }
 }
 
 function drawEngineFlame(x, y, verticalVelocity) {
@@ -142,7 +155,7 @@ function draw() {
   if(!gameStarted) {
     background(0,0,0)
     image(fond_etoiles,0,0,900,600)
-    image(fond_planetes,0,0,900,600)
+    drawPlanets(0)
     return
   }
 
@@ -162,8 +175,7 @@ function draw() {
   image(fond_etoiles,fond_etoilesX+900,0,900,600)
   image(fond_nebuleuse,fond_nebuleuseX,0,900,600)
   image(fond_nebuleuse,fond_nebuleuseX+900,0,900,600)
-  image(fond_planetes,fond_planetesX,0,900,600)
-  image(fond_planetes,fond_planetesX+900,0,900,600)
+  drawPlanets(planetesX)
   
   // Dessin des sprites
   drawEngineFlame(spaceship_x + 9, spaceship_y + spaceship_h / 2, shipVerticalVelocity)
@@ -240,8 +252,8 @@ function draw() {
   if (fond_etoilesX< -900) {fond_etoilesX = 0}
   fond_nebuleuseX=fond_nebuleuseX-speed/3
   if (fond_nebuleuseX< -900) {fond_nebuleuseX = 0}
-  fond_planetesX=fond_planetesX-speed/2
-  if (fond_planetesX< -900) {fond_planetesX = 0}
+  planetesX=planetesX-speed/2
+  if (planetesX< -900) {planetesX = 0}
     
   // Accélération et distance parcourue:
   speed = acceleration + speed
