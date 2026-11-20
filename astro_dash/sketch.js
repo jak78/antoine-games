@@ -4,6 +4,7 @@ let saved_speed = 0
 let musicTracks = []
 let currentMusicIndex = -1
 let musicPlaybackId = 0
+let shipVerticalVelocity = 0
 
 // Cette fonction est exécutée une seule fois
 async function setup() {
@@ -72,6 +73,7 @@ function resetGame() {
   spaceship_y = 150
   spaceship_w = 150
   spaceship_h = 100
+  shipVerticalVelocity = 0
  
   fond_etoilesX=0
   fond_nebuleuseX=0
@@ -104,6 +106,37 @@ function displayPause() {
   image(pause_img, 200, 220, 500, 150);
 }
 
+function drawEngineFlame(x, y, verticalVelocity) {
+  const time = millis() / 70
+  const baseLength = 30 + Math.sin(time * 0.8) * 4 + Math.abs(verticalVelocity) * 0.35
+  const lean = constrain(-verticalVelocity * 0.3, -7, 7)
+
+  push()
+  noStroke()
+  for (let row = -3; row <= 3; row++) {
+    const distanceFromCenter = Math.abs(row)
+    const flicker = Math.sin(time + row * 1.8) * 3
+    const length = Math.max(0, baseLength * (1 - distanceFromCenter / 4.5) + flicker)
+    const rowY = y + row * 4 + lean * (length / baseLength)
+
+    fill(255, 74, 20)
+    rect(x - length, rowY - 2, length, 4)
+
+    if (distanceFromCenter <= 2) {
+      const middleLength = length * 0.68
+      fill(255, 174, 35)
+      rect(x - middleLength, rowY - 2, middleLength, 4)
+    }
+
+    if (distanceFromCenter <= 1) {
+      const coreLength = length * 0.34
+      fill(255, 244, 157)
+      rect(x - coreLength, rowY - 2, coreLength, 4)
+    }
+  }
+  pop()
+}
+
 // Cette fonction est exécutée en boucle
 function draw() {
   if(!gameStarted) {
@@ -114,10 +147,14 @@ function draw() {
   }
 
   // Commandes du vaisseau
+  let shipMovement = 0
   if (!pause && !gameover) {
+    const previousY = spaceship_y
     spaceship_y = mouseY
     if (mouseY >500) {spaceship_y =500}
+    shipMovement = spaceship_y - previousY
   }
+  shipVerticalVelocity = lerp(shipVerticalVelocity, constrain(shipMovement, -24, 24), 0.25)
 
   // 1. Dessiner le fond spatial
   background(0,0,0)
@@ -129,6 +166,7 @@ function draw() {
   image(fond_planetes,fond_planetesX+900,0,900,600)
   
   // Dessin des sprites
+  drawEngineFlame(spaceship_x + 9, spaceship_y + spaceship_h / 2, shipVerticalVelocity)
   image(vaisseau, spaceship_x, spaceship_y, spaceship_w, spaceship_h);
   image(obstacle_moving ? obstacle_moving_img : obstacle,obstacles_x[0],obstacles_y[0],obstacles_w[0],obstacles_h[0])
   image(obstacle, obstacles_x[1],obstacles_y[1],obstacles_w[1],obstacles_h[1])
