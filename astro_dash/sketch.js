@@ -108,6 +108,54 @@ function makeGameOver() {
   userStopAudio()
 }
 
+const maskCache = new Map()
+
+// Masque des pixels opaques d'une image, à sa taille d'affichage.
+function getMask(img, w, h) {
+  let masksBySize = maskCache.get(img)
+  if (!masksBySize) {
+    masksBySize = new Map()
+    maskCache.set(img, masksBySize)
+  }
+  const key = w + 'x' + h
+  let mask = masksBySize.get(key)
+  if (!mask) {
+    const scaled = img.get()
+    scaled.resize(w, h)
+    scaled.loadPixels()
+    const d = Math.round(Math.sqrt(scaled.pixels.length / 4 / (w * h)))
+    const realW = w * d
+    const opaque = new Uint8Array(w * h)
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const alpha = scaled.pixels[((y * d) * realW + x * d) * 4 + 3]
+        opaque[y * w + x] = alpha > 128 ? 1 : 0
+      }
+    }
+    mask = { w, h, opaque }
+    masksBySize.set(key, mask)
+  }
+  return mask
+}
+
+function pixelCollision(maskA, ax, ay, maskB, bx, by) {
+  ax = Math.round(ax); ay = Math.round(ay)
+  bx = Math.round(bx); by = Math.round(by)
+  const left = Math.max(ax, bx)
+  const right = Math.min(ax + maskA.w, bx + maskB.w)
+  const top = Math.max(ay, by)
+  const bottom = Math.min(ay + maskA.h, by + maskB.h)
+  if (left >= right || top >= bottom) return false
+  for (let y = top; y < bottom; y++) {
+    const rowA = (y - ay) * maskA.w - ax
+    const rowB = (y - by) * maskB.w - bx
+    for (let x = left; x < right; x++) {
+      if (maskA.opaque[rowA + x] && maskB.opaque[rowB + x]) return true
+    }
+  }
+  return false
+}
+
 function displayGameOver() {
   image(game_over_img, 200, 150, 500, 300);
 }
@@ -268,12 +316,12 @@ function draw() {
   speed = acceleration + speed
   distanceTraveled += speed
 
-  // Détection de collision :
-  nose_x = spaceship_x + spaceship_w
-  nose_y = spaceship_y + ( spaceship_h / 2 )
+  // Détection de collision (pixels non-transparents du vaisseau et des obstacles) :
+  const shipMask = getMask(vaisseau, spaceship_w, spaceship_h)
   for (let i = 0; i < obstacles_x.length; i++) {
-    if ((nose_x >= obstacles_x[i]) && (nose_x <= obstacles_x[i] + obstacles_w[i])
-        && (nose_y >= obstacles_y[i]) && (nose_y <= obstacles_y[i] + obstacles_h[i])) {
+    const obstacleImg = (i === 0 && obstacle_moving) ? obstacle_moving_img : obstacle
+    const obstacleMask = getMask(obstacleImg, obstacles_w[i], obstacles_h[i])
+    if (pixelCollision(shipMask, spaceship_x, spaceship_y, obstacleMask, obstacles_x[i], obstacles_y[i])) {
       makeGameOver()
     }
   }
