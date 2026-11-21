@@ -21,6 +21,11 @@ async function setup() {
   planete_rouge = await loadImage('planete_rouge.png')
   planete_crateres = await loadImage('planete_crateres.png')
   game_over_img = await loadImage('game_over.png')
+  astro_logos = await Promise.all([
+    loadImage('astro-dash-1.png'),
+    loadImage('astro-dash-2.png'),
+    loadImage('astro-dash-4.png')
+  ])
   musicTracks = await Promise.all([
     loadSound('music/01_slay_the_evil.mp3'),
     loadSound('music/15_rush_point.mp3')
@@ -34,6 +39,8 @@ async function setup() {
     resetGame()
   })
   startButton.disabled = false
+
+  numero_astro_logo = Math.floor(Math.random() * astro_logos.length)
 }
 
 function switchMusic() {
@@ -157,6 +164,7 @@ function draw() {
     image(fond_etoiles,0,0,900,600)
     image(fond_nebuleuse,0,0,900,600)
     drawPlanets(0)
+    image(astro_logos[numero_astro_logo], 200, 0, 500, 300)
     return
   }
 
