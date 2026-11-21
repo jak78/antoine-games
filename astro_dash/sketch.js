@@ -205,6 +205,26 @@ function drawEngineFlame(x, y, verticalVelocity) {
   pop()
 }
 
+function setObstacleY(obstacleIndex, otherObstacleIndex) {
+  if(obstacles_y[otherObstacleIndex] == 0) {
+    pos_autorisee_1 = 150
+    pos_autorisee_2 = 300
+  }
+  if(obstacles_y[otherObstacleIndex] == 150) {
+    pos_autorisee_1 = 0
+    pos_autorisee_2 = 300
+  }
+  if(obstacles_y[otherObstacleIndex] == 300) {
+    pos_autorisee_1 = 0
+    pos_autorisee_2 = 150
+  }
+  if(Math.random() < 0.5) {
+    obstacles_y[obstacleIndex] = pos_autorisee_1
+  } else {
+    obstacles_y[obstacleIndex] = pos_autorisee_2
+  }
+}
+
 // Cette fonction est exécutée en boucle
 function draw() {
   if(!gameStarted) {
@@ -261,43 +281,11 @@ function draw() {
       obstacles_h[0] = 300
       obstacles_w[0] = 100
     }
-    if(obstacles_y[1] == 0) {
-      pos_autorisee_1 = 150
-      pos_autorisee_2 = 300
-    }
-    if(obstacles_y[1] == 150) {
-      pos_autorisee_1 = 0
-      pos_autorisee_2 = 300
-    }
-    if(obstacles_y[1] == 300) {
-      pos_autorisee_1 = 0
-      pos_autorisee_2 = 150
-    }
-    if(Math.random() < 0.5) {
-      obstacles_y[0] = pos_autorisee_1
-    } else {
-      obstacles_y[0] = pos_autorisee_2
-    }    
+    setObstacleY(0, 1)
   }
   if(obstacles_x[1] < -100) {
     obstacles_x[1] = 900
-    if(obstacles_y[0] == 0) {
-      pos_autorisee_1 = 150
-      pos_autorisee_2 = 300
-    }
-    if(obstacles_y[0] == 150) {
-      pos_autorisee_1 = 0
-      pos_autorisee_2 = 300
-    }
-    if(obstacles_y[0] == 300) {
-      pos_autorisee_1 = 0
-      pos_autorisee_2 = 150
-    }
-    if(Math.random() < 0.5) {
-      obstacles_y[1] = pos_autorisee_1
-    } else {
-      obstacles_y[1] = pos_autorisee_2
-    }
+    setObstacleY(1, 0)
   }
   if(obstacle_moving && ! pause && !gameover) {
     // Fais varier la coordonnée Y de l'obstacle de façon sinusoidale
